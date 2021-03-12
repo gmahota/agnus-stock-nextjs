@@ -1,114 +1,103 @@
-import React, { useEffect, useState } from 'react'
-import Router, { useRouter } from 'next/router'
+import React, { useEffect, useState } from "react";
+import Router, { useRouter } from "next/router";
 
-import {
-  IconButton,
-  InputBase,
-  Link,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Toolbar,
-  Typography
-} from '@material-ui/core'
-import { Product, ProductOptions } from '../../model/base/product'
-import { get_Products } from '../../services/base/productService'
-import { AddCircle, DetailsOutlined, Search } from '@material-ui/icons'
+import { FiPlus } from "react-icons/fi";
+import SectionTitle from "../../components/section-title";
+import Datatable from "../../components/datatable";
+import countries from "../../json/countries.json";
+import Widget from "../../components/widget";
+import { formatNumber } from "../../functions/numbers";
+
+import { get_Products } from "../../services/base/productService";
+import { Link } from "next/link";
+
+const Simple = (data) => {
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "#",
+        accessor: "id",
+      },
+      {
+        Header: "Code",
+        accessor: "code",
+      },
+      {
+        Header: "Description",
+        accessor: "description",
+      },
+      {
+        Header: "Price",
+        accessor: "price",
+        Cell: (props) => <span>{formatNumber(props.value)}</span>,
+      },
+    ],
+    []
+  );
+
+  return <Datatable columns={columns} data={data.allProducts} />;
+};
 
 export default function ProductList({ allProducts }) {
-  const router = useRouter()
+  const router = useRouter();
 
   if (router.isFallback) {
-    return <p>Carregando...</p>
+    return <p>Carregando...</p>;
   }
 
-  const [filterStr, setFilterStr] = useState('')
+  if (!allProducts) {
+    return <p>Carregando...</p>;
+  }
 
   const handleNew = () => {
-    router.push('/products/create')
-  }
+    router.push("/products/create");
+  };
   return (
-    <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
-      <div className="flex flex-wrap items-center">
-        <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-          <h3 className="font-semibold text-base text-gray-800">
-            Product List's
-          </h3>
-          <div>
-            <Search />
+    <>
+      <SectionTitle
+        title="Tables"
+        subtitle="Products"
+        right={
+          <div className="flex-shrink-0 space-x-2">
+            <a
+              href="/products/create"
+              className="btn btn-default btn-rounded btn-icon bg-blue-500 hover:bg-blue-600 text-white space-x-1"
+            >
+              <FiPlus className="stroke-current text-white" size={16} />
+              <span>Add</span>
+            </a>
           </div>
-          <div>
-            <InputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-              value={filterStr}
-              onChange={event => setFilterStr(event.target.value.toLowerCase())}
-            />
-          </div>
-        </div>
-        <div className="relative w-full px-4 max-w-full flex-grow flex-1 text-right">
-          <IconButton
-            aria-label="Create New Order"
-            onClick={handleNew}
-            color="inherit"
-          >
-            <AddCircle />
-          </IconButton>
-        </div>
-      </div>
-
-      <div className="rounded-t mb-0 px-4 py-3 bg-transparent">
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell align="left">#</TableCell>
-              <TableCell align="left">Code</TableCell>
-              <TableCell align="left">Description</TableCell>
-              <TableCell align="left">Price</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {allProducts
-              ?.filter(
-                e =>
-                  filterStr.length === 0 ||
-                  e.code?.toLowerCase().includes(filterStr) ||
-                  e.customer?.toLowerCase().includes(filterStr) ||
-                  e.name?.toLowerCase().includes(filterStr)
-              )
-              .map(product => (
-                <TableRow key={product.code}>
-                  <TableCell align="left">
-                    <Link href={`/products/${product.code}`}>
-                      <DetailsOutlined />
-                    </Link>
-                  </TableCell>
-                  <TableCell align="left">{product.code}</TableCell>
-                  <TableCell align="left">{product.description}</TableCell>
-                  <TableCell align="left">{product.price}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  )
+        }
+      />
+      <Widget
+        title="Product List's"
+        description={
+          <span>
+            List of all<code>&lt;Product's /&gt;</code> on the database table
+          </span>
+        }
+      >
+        <Simple allProducts={allProducts} />
+      </Widget>
+    </>
+  );
 }
 
-export const getStaticProps = async () => {
-  const products = await get_Products()
+export async function getStaticProps() {
+  const products = await get_Products();
 
-  const allProducts = products.map(product => {
-    const p: ProductOptions = {
-      ...product
-    }
-    return p
-  })
+  if (!products) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const allProducts = products;
+
   return {
     props: {
-      allProducts
-    }
-  }
+      allProducts,
+    },
+    revalidate: 10,
+  };
 }

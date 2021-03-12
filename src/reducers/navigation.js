@@ -58,6 +58,23 @@ const initialState = [
           },
         ],
       },
+      {
+        url: "/",
+        icon: <FiList size={20} />,
+        title: "Produto",
+        items: [
+          {
+            url: "/products/",
+            title: "Lista",
+            items: [],
+          },
+          {
+            url: "/products/create",
+            title: "Novo",
+            items: [],
+          },
+        ],
+      },
     ],
   },
   {

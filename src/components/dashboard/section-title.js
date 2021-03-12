@@ -1,6 +1,6 @@
-import {FiPlus} from 'react-icons/fi'
+import { FiPlus } from "react-icons/fi";
 
-const SectionTitle = ({title, subtitle, right = null}) => {
+const SectionTitle = ({ title, subtitle, right = null }) => {
   return (
     <div className="w-full mb-6 pt-3">
       <div className="flex flex-row items-center justify-between mb-4">
@@ -18,7 +18,7 @@ const SectionTitle = ({title, subtitle, right = null}) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SectionTitle
+export default SectionTitle;

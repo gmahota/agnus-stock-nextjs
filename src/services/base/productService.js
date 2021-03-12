@@ -34,4 +34,21 @@ const get_Products = async () => {
     throw e;
   }
 };
-export { get_ProductById, get_Products };
+
+const create_Product = async (data) => {
+  try {
+    const response = await fetch(
+      `${publicRuntimeConfig.SERVER_URI}base/Products`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: data,
+      }
+    );
+  } catch (e) {
+    throw e;
+  }
+};
+export { get_ProductById, get_Products, create_Product };

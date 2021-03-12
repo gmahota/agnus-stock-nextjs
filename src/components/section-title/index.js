@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types'
+import Router, { useRouter } from "next/router";
 
-const SectionTitle = ({title, subtitle, right = null}) => {
+const SectionTitle = ({ title, subtitle, right = null }) => {
+  const router = useRouter();
   return (
     <div className="section-title w-full mb-6 pt-3">
       <div className="flex flex-row items-center justify-between mb-4">
